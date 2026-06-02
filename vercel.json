@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": ".",
+  "devCommand": "npm run dev",
+  "cleanUrls": true,
+  "trailingSlash": false
+}

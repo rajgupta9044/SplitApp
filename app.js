@@ -22,13 +22,23 @@ app.use('/api/group', apiAuth.validateToken, groupRouter)
 app.use('/api/expense', apiAuth.validateToken, expenseRouter)
 
 // Serve static React frontend
-app.use(express.static(path.join(__dirname, 'client/build')));
+const buildPath = path.join(__dirname, 'client', 'build');
+app.use(express.static(buildPath));
 
 // Fallback to React index.html for SPA routing
 app.get('*', (req, res) => {
     // Don't serve HTML for API routes that don't exist (let them fall through to error handler)
     if (!req.path.startsWith('/api')) {
-        res.sendFile(path.join(__dirname, 'client/build/index.html'));
+        const indexPath = path.join(buildPath, 'index.html');
+        res.sendFile(indexPath, (err) => {
+            if (err) {
+                logger.error(`Error serving index.html: ${err.message}`)
+                res.status(500).json({
+                    status: 'fail',
+                    message: 'Error loading application'
+                })
+            }
+        });
     } else {
         // Invalid API route
         logger.error(`[Invalid Route] ${req.originalUrl}`)
