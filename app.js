@@ -9,7 +9,7 @@ const path = require('path');
 dotenv.config()
 
 var usersRouter = require('./routes/userRouter')
-var gorupRouter = require('./routes/groupRouter')
+var groupRouter = require('./routes/groupRouter')
 var expenseRouter = require('./routes/expenseRouter')
 
 var app = express()
@@ -18,24 +18,26 @@ app.use(express.json())
 app.use(requestLogger)
 
 app.use('/api/users', usersRouter)
-app.use('/api/group', apiAuth.validateToken,gorupRouter)
-app.use('/api/expense', apiAuth.validateToken,expenseRouter)
+app.use('/api/group', apiAuth.validateToken, groupRouter)
+app.use('/api/expense', apiAuth.validateToken, expenseRouter)
 
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
-    app.use(express.static('client/build'));
-    app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname,'client','build','index.html'));
-    });
-   }
+// Serve static React frontend
+app.use(express.static(path.join(__dirname, 'client/build')));
 
-//To detect and log invalid api hits 
-app.all('*', (req, res) => {
-    logger.error(`[Invalid Route] ${req.originalUrl}`)
-    res.status(404).json({
-        status: 'fail',
-        message: 'Invalid path'
-      })
-})
+// Fallback to React index.html for SPA routing
+app.get('*', (req, res) => {
+    // Don't serve HTML for API routes that don't exist (let them fall through to error handler)
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, 'client/build/index.html'));
+    } else {
+        // Invalid API route
+        logger.error(`[Invalid Route] ${req.originalUrl}`)
+        res.status(404).json({
+            status: 'fail',
+            message: 'Invalid path'
+        })
+    }
+});
 
 const port = process.env.PORT || 3001
 app.listen(port, (err) => {
