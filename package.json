@@ -4,15 +4,18 @@
   "description": "This is a group money spliting app made with MERN stack ",
   "main": "app.js",
   "scripts": {
-    "test": "npx nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "server": "nodemon app.js",
+    "client": "cd client && npm start",
+    "build": "cd client && npm install && npm run build",
     "start": "node app.js",
     "heroku-postbuild": "cd client && npm install && npm run build",
-    "dev": "concurrently \"npm test\" \"cd client && npm start\" "
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [
     "SplitWise"
   ],
-  "author": "Sunny George",
+  "author": "Raj Gupta",
   "license": "ISC",
   "dependencies": {
     "@mui/x-data-grid": "^5.12.3",
@@ -30,6 +33,7 @@
     "winston": "^3.7.2"
   },
   "devDependencies": {
-    "concurrently": "^7.2.2"
+    "concurrently": "^7.2.2",
+    "nodemon": "^2.0.22"
   }
 }
